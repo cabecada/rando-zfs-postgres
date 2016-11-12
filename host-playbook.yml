@@ -1,0 +1,14 @@
+---
+- hosts: default
+  become: yes
+
+  tasks:
+    - name: install host packages
+      pkgng: name={{ item }} state=present
+      with_items:
+        - iocage
+
+    - name: fetch release for iocage
+      command: iocage fetch release=10.3-RELEASE      
+      args:
+        creates: /iocage/releases/10.3-RELEASE
