@@ -7,8 +7,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "freebsd/FreeBSD-11.1-STABLE"
   config.vm.base_mac = "080027D14C66"
   config.ssh.shell = "/bin/sh"
-  config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+
   config.vm.synced_folder ".", "/vagrant", type: "rsync"
+  config.vm.network "private_network", ip: "10.20.30.40"
+  config.vm.network "forwarded_port", guest: 5432, host: 15432
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", "4096"]
@@ -26,5 +28,4 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "shell", path: "provision.sh"
-
 end

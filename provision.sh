@@ -21,16 +21,19 @@ if ! zfs list -H | grep -q "$DATASET"; then
     zfs set primarycache=metadata "$DATASET"
 fi
 
-BASEDB=pool1/db/basedb
-if ! zfs list -H | grep -q "$BASEDB" ; then
-    zfs create -o mountpoint=/db/basedb "$BASEDB"
+CLUSTER=pool1/db/cluster1
+if ! zfs list -H | grep -q "$CLUSTER" ; then
+    zfs create -o mountpoint=/db/cluster1 "$CLUSTER"
 fi
 
-chown postgres:postgres /db/basedb
+chown postgres:postgres /db/cluster1
 
 sysrc postgresql_enable="YES"
-sysrc postgresql_data="/db/basedb"
-if ! su postgres -c "pg_ctl status -D /db/basedb" ; then
-    su postgres -c "initdb --no-locale -E UTF8 -n -N -D /db/basedb"
+sysrc postgresql_data="/db/cluster1"
+if ! su postgres -c "pg_ctl status -D /db/cluster1" ; then
+    su postgres -c "initdb --no-locale -E UTF8 -n -N -D /db/cluster1"
+    cp /vagrant/pg_hba.conf /db/cluster1/pg_hba.conf
+    cp /vagrant/postgresql.conf /db/cluster1/postgresql.conf
+    chown postgres:postgres /db/cluster1/pg_hba.conf /db/cluster1/postgresql.conf
     service postgresql start
 fi
