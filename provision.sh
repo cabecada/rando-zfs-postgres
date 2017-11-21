@@ -10,7 +10,7 @@ if ! zpool list -H | grep -q pool1 ; then
     zpool create pool1 /dev/ada1
 fi
 
-pkg install -y postgresql96-server
+pkg install -y postgresql96-server postgresql96-contrib
 
 DATASET=pool1/db
 if ! zfs list -H | grep -q "$DATASET"; then
