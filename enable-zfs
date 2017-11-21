@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+set -x
+
+# With these settings, postgres will be run from /db/cluster1
+POOL_NAME="pool1"
+MOUNT_POINT_NAME="db"
+PGCLUSTER_NAME="cluster1"
+
+set -e
+sysrc zfs_enable="YES"
+service zfs start
+
+# If the zpool does not exist, create it
+if ! zpool list -H | grep -q "$POOL_NAME" ; then
+    zpool create "$POOL_NAME" /dev/ada1
+fi
+
+# If the base filesystem does not exist, create it
+BASE_DATASET="$POOL_NAME/$MOUNT_POINT_NAME"
+if ! zfs list -H | grep -q "$BASE_DATASET"; then
+    zfs create -o mountpoint="/$MOUNT_POINT_NAME" "$BASE_DATASET"
+    zfs set atime=off "$BASE_DATASET"
+    zfs set compression=lz4 "$BASE_DATASET"
+    zfs set recordsize=16K "$BASE_DATASET"
+    zfs set primarycache=metadata "$BASE_DATASET"
+fi
+
+# If the cluster filesystem does not exist, create it
+CLUSTER_DATASET="$BASE_DATASET/$PGCLUSTER_NAME"
+if ! zfs list -H | grep -q "$CLUSTER_DATASET" ; then
+    zfs create -o mountpoint="/$MOUNT_POINT_NAME/$PGCLUSTER_NAME" "$CLUSTER_DATASET"
+fi

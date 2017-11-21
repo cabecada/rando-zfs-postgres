@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -e
+
+pkg install -q -y tmux redis postgresql96-server postgresql96-contrib
