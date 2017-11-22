@@ -1,0 +1,5 @@
+#!/bin/sh
+
+service postgresql stop
+zfs rollback pool1/db/cluster1@current_snapshot
+service postgresql start
