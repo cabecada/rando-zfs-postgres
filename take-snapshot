@@ -1,0 +1,5 @@
+#!/bin/sh
+
+psql -U postgres -c "select pg_start_backup('current_snapshot');" && \
+    zfs snapshot pool1/db/cluster1@current_snapshot && \
+    psql -U postgres -c "select pg_stop_backup();"
